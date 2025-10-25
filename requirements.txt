@@ -1,0 +1,6 @@
+--only-binary :all:
+python-telegram-bot==20.3
+Flask==3.0.3
+requests==2.31.0
+Pillow==10.4.0
+pyngrok==7.0.5
