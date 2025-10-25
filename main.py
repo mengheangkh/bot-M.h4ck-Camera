@@ -17,7 +17,7 @@ import html
 import urllib.parse
 
 # កំណត់ Ngrok Authtoken របស់អ្នក
-NGROK_AUTHTOKEN = os.getenv("NGROK_AUTHTOKEN", "325APCitQYPUCXXwDDPZQQbfg7O_3A2qNKdACnHAdY9LChsgt")  # ⚠️ ជំនួសដោយ authtoken របស់អ្នក
+NGROK_AUTHTOKEN = ("NGROK_AUTHTOKEN", "325APCitQYPUCXXwDDPZQQbfg7O_3A2qNKdACnHAdY9LChsgt")  # ⚠️ ជំនួសដោយ authtoken របស់អ្នក
 
 # កំណត់ authtoken មុនពេលប្រើ ngrok
 ngrok.set_auth_token(NGROK_AUTHTOKEN)
@@ -30,7 +30,7 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 # កំណត់រចនាសម្ព័ន្ធ Bot
-TOKEN = os.getenv("TELEGRAM_BOT_TOKEN", "8102744793:AAF8kONmSVnWJK66WxR0GcKj98RU9tNqGVg")
+TOKEN = ("TELEGRAM_BOT_TOKEN", "8102744793:AAF8kONmSVnWJK66WxR0GcKj98RU9tNqGVg")
 TELEGRAM_ID = "1530069749"  # Admin ID
 
 # កំណត់រចនាសម្ព័ន្ធវ៉េបសារវែរ
