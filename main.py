@@ -16,6 +16,12 @@ import asyncio
 import html
 import urllib.parse
 
+# កំណត់ Ngrok Authtoken របស់អ្នក
+NGROK_AUTHTOKEN = os.getenv("NGROK_AUTHTOKEN", "325APCitQYPUCXXwDDPZQQbfg7O_3A2qNKdACnHAdY9LChsgt")  # ⚠️ ជំនួសដោយ authtoken របស់អ្នក
+
+# កំណត់ authtoken មុនពេលប្រើ ngrok
+ngrok.set_auth_token(NGROK_AUTHTOKEN)
+
 # កំណត់រចនាសម្ព័ន្ធ logging
 logging.basicConfig(
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
